@@ -38,5 +38,5 @@ Want to improve the game? Feel free to modify the source code and contribute!
 
 
 ## Enjoy the game! 🚀🐦
-![photo_2025-03-15_18-14-14](https://github.com/user-attachments/assets/3b337a61-b15a-47b2-8bd5-43620c455da1)
+![photo_2025-03-15_18-14-14](https://github.com/user-attachments/assets/fd6536f9-f053-4aa5-9ded-f03cdb6a442d)
 
