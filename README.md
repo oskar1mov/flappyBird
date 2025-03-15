@@ -1,13 +1,14 @@
-FlappyBird
+## FLAPPY BIRD
+
 A simple Flappy Bird game built using Java and Swing.
 
-🛠 Prerequisites
+## 🛠 Prerequisites
 Before running the game, ensure you have the following installed:
 
 Java Development Kit (JDK) 11 or later
 
 
-🚀 How to Run
+ ## 🚀 How to Run
 1️⃣ Clone the repository
 Open a terminal and run:
 git clone https://github.com/oskar1mov/FlappyBird.git  
@@ -24,16 +25,18 @@ Execute the compiled Java application:
 java -cp bin App 
 
 
-🎮 Gameplay Instructions
+## 🎮 Gameplay Instructions
 Press Spacebar to make the bird jump.
 Avoid hitting the pipes or the ground.
 Try to get the highest score possible!
 
 
-📌 Notes
+## 📌 Notes
 If the game window does not open, ensure that your Java installation is correctly set up.
 Image loading issues? Verify that the asset paths in your code match the actual file locations.
 Want to improve the game? Feel free to modify the source code and contribute!
 
 
-Enjoy the game! 🚀🐦
+## Enjoy the game! 🚀🐦
+![photo_2025-03-15_18-14-14](https://github.com/user-attachments/assets/3b337a61-b15a-47b2-8bd5-43620c455da1)
+
