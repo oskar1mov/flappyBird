@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.prefs.BackingStoreException;
@@ -11,6 +12,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     int boardWidth = 360;
     int boardHeight = 640;
 
+    private Font customFont;
     // Images
     Image backgroundImg;
     Image birdImg;
@@ -75,6 +77,7 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     private static final String HIGH_SCORE_KEY = "flappyBirdHighScore";
 
     private Preferences prefs;
+    JButton restartButton;
 
     FlappyBird() {
         setPreferredSize(new Dimension(boardWidth, boardHeight));
@@ -82,17 +85,29 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         setFocusable(true);
         addKeyListener(this);
 
+        loadCustomFont();
+
         prefs = Preferences.userNodeForPackage(FlappyBird.class);
         highScore = prefs.getInt(HIGH_SCORE_KEY, 0);
 
         // load images
-        backgroundImg = new ImageIcon(getClass().getResource("./flappybirdbg.png")).getImage(); // исправлено расширение
+        backgroundImg = new ImageIcon(getClass().getResource("./flappybirdbg.png")).getImage();
         birdImg = new ImageIcon(getClass().getResource("./flappybird.png")).getImage();
         topPipeImg = new ImageIcon(getClass().getResource("./toppipe.png")).getImage();
         bottomPipeImg = new ImageIcon(getClass().getResource("./bottompipe.png")).getImage();
         // bird
         bird = new Bird(birdImg);
         pipes = new ArrayList<Pipe>();
+
+        // Restart Button
+        restartButton = new JButton("Restart");
+        restartButton.setFont(customFont.deriveFont(Font.BOLD, 18));
+        restartButton.setBounds(boardWidth / 2 - 60, boardHeight / 2, 120, 40);
+        restartButton.addActionListener(e -> restartGame());
+        restartButton.setVisible(false);
+
+        setLayout(null);
+        add(restartButton);
 
         // place pipes timer
         placePipesTimer = new Timer(1500, new ActionListener() {
@@ -106,6 +121,19 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
         // game timer
         gameLoop = new Timer(1000 / 60, this); // 1000/60=16.6
         gameLoop.start();
+
+    }
+
+    private void loadCustomFont() {
+        try {
+            InputStream is = getClass().getResourceAsStream("./PressStart2P-Regular.ttf");
+            customFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(customFont);
+        } catch (Exception e) {
+            e.printStackTrace();
+            customFont = new Font("Arial", Font.PLAIN, 12);
+        }
     }
 
     public void placePipes() {
@@ -147,13 +175,21 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
         // score and highscore
         g.setColor(Color.white);
-        g.setFont(new Font("Arial", Font.PLAIN, 32));
+        g.setFont(customFont.deriveFont(18f));
+        g.drawString(String.valueOf((int) score), 10, 30);
+        g.drawString("High: " + highScore, boardWidth - 150, 30);
+
         if (gameOver) {
-            g.drawString("Game Over: " + String.valueOf((int) score), 10, 35);
-            g.drawString("High Score: " + String.valueOf(highScore), 10, 75);
-        } else {
-            g.drawString(String.valueOf((int) score), 10, 35);
-            g.drawString("High: " + String.valueOf(highScore), boardWidth - 120, 35);
+            g.setFont(customFont.deriveFont(Font.BOLD, 20f));
+            g.drawString("Game Over!", boardWidth / 2 - 80, boardHeight / 2 - 40);
+
+            g.setFont(customFont.deriveFont(18f));
+            g.drawString("Score: " + (int) score, boardWidth / 2 - 60, boardHeight / 2);
+            g.drawString("High Score: " + highScore, boardWidth / 2 - 110, boardHeight / 2 + 30);
+
+            restartButton.setFont(customFont.deriveFont(10f));
+            restartButton.setBounds(boardWidth / 2 - 50, boardHeight / 2 + 60, 130, 50);
+            restartButton.setVisible(true);
         }
 
     }
@@ -177,12 +213,14 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
             if (collision(bird, pipe)) {
                 gameOver = true;
                 updateHighScore();
+                restartButton.setVisible(true);
             }
         }
 
         if (bird.y > boardHeight) {
             gameOver = true;
             updateHighScore();
+            restartButton.setVisible(true);
         }
     }
 
@@ -221,16 +259,18 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             velocityY = -9;
-            if (gameOver) {
-                bird.y = birdY;
-                velocityY = 0;
-                pipes.clear();
-                score = 0;
-                gameOver = false;
-                gameLoop.start();
-                placePipesTimer.start();
-            }
         }
+    }
+
+    public void restartGame() {
+        bird.y = birdY;
+        velocityY = 0;
+        pipes.clear();
+        score = 0;
+        gameOver = false;
+        restartButton.setVisible(false);
+        gameLoop.start();
+        placePipesTimer.start();
     }
 
     @Override
