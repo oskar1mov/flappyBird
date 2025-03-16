@@ -2,6 +2,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+
 import javax.swing.*;
 
 public class FlappyBird extends JPanel implements ActionListener, KeyListener {
@@ -67,12 +70,20 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
     boolean gameOver = false;
     double score = 0;
+    int highScore = 0;
+
+    private static final String HIGH_SCORE_KEY = "flappyBirdHighScore";
+
+    private Preferences prefs;
 
     FlappyBird() {
         setPreferredSize(new Dimension(boardWidth, boardHeight));
         // setBackground(Color.blue);
         setFocusable(true);
         addKeyListener(this);
+
+        prefs = Preferences.userNodeForPackage(FlappyBird.class);
+        highScore = prefs.getInt(HIGH_SCORE_KEY, 0);
 
         // load images
         backgroundImg = new ImageIcon(getClass().getResource("./flappybirdbg.png")).getImage(); // исправлено расширение
@@ -134,14 +145,15 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
             g.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height, null);
         }
 
-        // score
+        // score and highscore
         g.setColor(Color.white);
         g.setFont(new Font("Arial", Font.PLAIN, 32));
         if (gameOver) {
             g.drawString("Game Over: " + String.valueOf((int) score), 10, 35);
-
+            g.drawString("High Score: " + String.valueOf(highScore), 10, 75);
         } else {
             g.drawString(String.valueOf((int) score), 10, 35);
+            g.drawString("High: " + String.valueOf(highScore), boardWidth - 120, 35);
         }
 
     }
@@ -164,11 +176,26 @@ public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
             if (collision(bird, pipe)) {
                 gameOver = true;
+                updateHighScore();
             }
         }
 
         if (bird.y > boardHeight) {
             gameOver = true;
+            updateHighScore();
+        }
+    }
+
+    private void updateHighScore() {
+        if ((int) score > highScore) {
+            highScore = (int) score;
+            // save new record
+            prefs.putInt(HIGH_SCORE_KEY, highScore);
+            try {
+                prefs.flush(); // save changes
+            } catch (BackingStoreException e) {
+                e.printStackTrace();
+            }
         }
     }
 
